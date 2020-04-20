@@ -1,0 +1,204 @@
++*In[9]:*+
+[source, ipython3]
+----
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+casas = pd.read_csv('original.csv') #Este archivo es un dataset que se utilizara para hacer los ejercicios
+----
+
+Ejecutamos este codigo para verificar las columnas y no equivocarnos de
+nombre: *casas.columns*
+
+
++*In[14]:*+
+[source, ipython3]
+----
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+----
+
+Los valores utilizados para *x* son *los valores numericos*, mientras
+que el valor para *y* es *lo que se quiere saber*
+
+
++*In[17]:*+
+[source, ipython3]
+----
+casas.columns
+----
+
+
++*Out[17]:*+
+----Index(['Avg. Area Income', 'Avg. Area House Age', 'Avg. Area Number of Rooms',
+       'Avg. Area Number of Bedrooms', 'Area Population', 'Price', 'Address'],
+      dtype='object')----
+
+Utilizaremos todas los parametros para x, y queremos saber el presio a
+futuro.
+
+
++*In[19]:*+
+[source, ipython3]
+----
+x= casas[['Avg. Area Income', 'Avg. Area House Age', 'Avg. Area Number of Rooms',
+       'Avg. Area Number of Bedrooms', 'Area Population']]
+x
+----
+
+
++*Out[19]:*+
+----
+[cols=",,,,,",options="header",]
+|=======================================================================
+| |Avg. Area Income |Avg. Area House Age |Avg. Area Number of Rooms
+|Avg. Area Number of Bedrooms |Area Population
+|0 |79545.458574 |5.682861 |7.009188 |4.09 |23086.800503
+
+|1 |79248.642455 |6.002900 |6.730821 |3.09 |40173.072174
+
+|2 |61287.067179 |5.865890 |8.512727 |5.13 |36882.159400
+
+|3 |63345.240046 |7.188236 |5.586729 |3.26 |34310.242831
+
+|4 |59982.197226 |5.040555 |7.839388 |4.23 |26354.109472
+
+|... |... |... |... |... |...
+
+|4995 |60567.944140 |7.830362 |6.137356 |3.46 |22837.361035
+
+|4996 |78491.275435 |6.999135 |6.576763 |4.02 |25616.115489
+
+|4997 |63390.686886 |7.250591 |4.805081 |2.13 |33266.145490
+
+|4998 |68001.331235 |5.534388 |7.130144 |5.44 |42625.620156
+
+|4999 |65510.581804 |5.992305 |6.792336 |4.07 |46501.283803
+|=======================================================================
+
+5000 rows × 5 columns
+----
+
+
++*In[22]:*+
+[source, ipython3]
+----
+y = casas['Price']
+y
+----
+
+
++*Out[22]:*+
+----0       1.059034e+06
+1       1.505891e+06
+2       1.058988e+06
+3       1.260617e+06
+4       6.309435e+05
+            ...     
+4995    1.060194e+06
+4996    1.482618e+06
+4997    1.030730e+06
+4998    1.198657e+06
+4999    1.298950e+06
+Name: Price, Length: 5000, dtype: float64----
+
+Es momento de entrenar la IA, entonces, declaramos que es lo que
+queremos entrenar y con que datos:
+
+
++*In[28]:*+
+[source, ipython3]
+----
+x_train, x_test, y_train, y_test = train_test_split(x,y,test_size = 0.3,random_state = 42) #Utilizaremos el 30% de los datos para el test y el 70% para entrenar
+----
+
+
++*In[30]:*+
+[source, ipython3]
+----
+lrm = LinearRegression() #Creamos el objeto que hara la regresion lineal
+lrm.fit(x_train,y_train) #Entrenamos el sistema
+----
+
+
++*Out[30]:*+
+----LinearRegression(copy_X=True, fit_intercept=True, n_jobs=None, normalize=False)----
+
+*Evaluamos Modelo*
+
+
++*In[31]:*+
+[source, ipython3]
+----
+from sklearn import metrics
+----
+
+
++*In[37]:*+
+[source, ipython3]
+----
+predicciones = lrm.predict(x_test)
+predicciones #Estos son los valores generados por la IA
+----
+
+
++*Out[37]:*+
+----array([1308536.1359262 , 1237122.72746477, 1243835.62817066, ...,
+       1457119.79297242, 1483428.9530937 , 1047510.59737176])----
+
+
++*In[38]:*+
+[source, ipython3]
+----
+y_test #Estos son los valore reales
+----
+
+
++*Out[38]:*+
+----1501    1.339096e+06
+2586    1.251794e+06
+2653    1.340095e+06
+1055    1.431508e+06
+705     1.042374e+06
+            ...     
+3563    1.348222e+06
+1538    1.309937e+06
+1837    1.472887e+06
+2380    1.409762e+06
+1912    1.009606e+06
+Name: Price, Length: 1500, dtype: float64----
+
+
++*In[41]:*+
+[source, ipython3]
+----
+plt.scatter(y_test,predicciones) #Esta es la diferencia entre los datos predecidos y los reales, entre más cerca de la linea esten, mejor es el sistema
+----
+
+
++*Out[41]:*+
+----<matplotlib.collections.PathCollection at 0x190be87cb88>
+![png](output_15_1.png)
+----
+
+
++*In[43]:*+
+[source, ipython3]
+----
+sns.distplot(y_test - predicciones) #Es la diferencia entre los datos reales y los predecidos por la ia
+----
+
+
++*Out[43]:*+
+----<matplotlib.axes._subplots.AxesSubplot at 0x190bea1d488>
+![png](output_16_1.png)
+----
+
+
++*In[ ]:*+
+[source, ipython3]
+----
+
+----
