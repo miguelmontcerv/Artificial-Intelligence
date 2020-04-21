@@ -29,6 +29,8 @@ print("\n")
 df1.drop('TotalZonas',axis = 1,inplace = True)
 print(df1)
 
+print("Hola gh")
+
 print("")
 df1.drop('ventas3',inplace = True)
 print(df1)

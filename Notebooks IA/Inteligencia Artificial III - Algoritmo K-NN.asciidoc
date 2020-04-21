@@ -1,0 +1,590 @@
+= Inteligencia Artificial III - Algoritmo K-NN
+
+
++*In[181]:*+
+[source, ipython3]
+----
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+----
+
+
++*In[182]:*+
+[source, ipython3]
+----
+df = pd.read_csv('veiculos.csv')
+----
+
+
++*In[183]:*+
+[source, ipython3]
+----
+df.head()
+----
+
+
++*Out[183]:*+
+----
+[cols=",,,,,,,,,,,,,,,,,,,",options="header",]
+|=======================================================================
+| |compactness |circularity |distance_circularity |radius_ratio
+|pr_axis_aspect_ratio |max_length_aspect_ratio |scatter_ratio
+|elongatedness |pr_axis_rectangularity |max_length_rectangularity
+|scaled_variance_major_axis |scaled_variance_minor_axis
+|scaled_radius_gyration |skewness_major_axis |skewness_minor_axis
+|kurtosis_minor_axis |kurtosis_major_axis |hollows_ratio |vehicle_class
+|0 |95.0 |48.0 |83.0 |178.0 |72.0 |10.0 |162.0 |42.0 |20.0 |159.0 |176.0
+|379.0 |184.0 |70.0 |6.0 |16.0 |187.0 |197.0 |van
+
+|1 |91.0 |41.0 |84.0 |141.0 |57.0 |9.0 |149.0 |45.0 |19.0 |143.0 |170.0
+|330.0 |158.0 |72.0 |9.0 |14.0 |189.0 |199.0 |van
+
+|2 |104.0 |50.0 |106.0 |209.0 |66.0 |10.0 |207.0 |32.0 |23.0 |158.0
+|223.0 |635.0 |220.0 |73.0 |14.0 |9.0 |188.0 |196.0 |saab
+
+|3 |93.0 |41.0 |82.0 |159.0 |63.0 |9.0 |144.0 |46.0 |19.0 |143.0 |160.0
+|309.0 |127.0 |63.0 |6.0 |10.0 |199.0 |207.0 |van
+
+|4 |85.0 |44.0 |70.0 |205.0 |103.0 |52.0 |149.0 |45.0 |19.0 |144.0
+|241.0 |325.0 |188.0 |127.0 |9.0 |11.0 |180.0 |183.0 |bus
+|=======================================================================
+----
+
+Con base en todos los datos proporcionados por el data set,
+clasificaremos el tipo de auto que es (la ultima columna)
+
+
++*In[184]:*+
+[source, ipython3]
+----
+#Para saber que tipos de vehiculos diferentes tenemos, utilizamos la función:
+df['vehicle_class'].unique()
+----
+
+
++*Out[184]:*+
+----array(['van', 'saab', 'bus', 'opel'], dtype=object)----
+
+
++*In[185]:*+
+[source, ipython3]
+----
+#Lo que queremos saber siempre es y en nuestro modelo
+y = df['vehicle_class']
+#Utilizaremos todos los datos exepto esa columa
+x = df.drop('vehicle_class',axis = 1)
+----
+
+
++*In[186]:*+
+[source, ipython3]
+----
+y.shape
+----
+
+
++*Out[186]:*+
+----(846,)----
+
+
++*In[187]:*+
+[source, ipython3]
+----
+#Importamos lib para la separacion de datos
+from sklearn.model_selection import train_test_split
+----
+
+
++*In[188]:*+
+[source, ipython3]
+----
+x_train, x_test, y_train, y_test = train_test_split(x,y,test_size = 0.3,random_state = 42) #Dividimos los datos
+----
+
+
++*In[189]:*+
+[source, ipython3]
+----
+y_train.shape
+----
+
+
++*Out[189]:*+
+----(592,)----
+
+
++*In[190]:*+
+[source, ipython3]
+----
+y_test.shape #Confirmamos la suma de datos igual al 100%
+----
+
+
++*Out[190]:*+
+----(254,)----
+
+
++*In[191]:*+
+[source, ipython3]
+----
+from sklearn.neighbors import KNeighborsClassifier #La lib necesaria para la clasificacion de los KNN
+knn = KNeighborsClassifier(n_neighbors = 3)
+----
+
+
++*In[192]:*+
+[source, ipython3]
+----
+knn.fit(x_train,y_train) #Entrenamos el modelo
+----
+
+
++*Out[192]:*+
+----KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+                     metric_params=None, n_jobs=None, n_neighbors=3, p=2,
+                     weights='uniform')----
+
+
++*In[193]:*+
+[source, ipython3]
+----
+predicciones = knn.predict(x_test)
+----
+
+
++*In[194]:*+
+[source, ipython3]
+----
+#imprimimos las predicciones
+predicciones
+----
+
+
++*Out[194]:*+
+----array(['bus', 'van', 'bus', 'bus', 'bus', 'van', 'van', 'saab', 'bus',
+       'saab', 'saab', 'bus', 'bus', 'saab', 'opel', 'van', 'bus', 'opel',
+       'opel', 'saab', 'van', 'van', 'opel', 'opel', 'saab', 'opel',
+       'opel', 'van', 'van', 'van', 'saab', 'van', 'bus', 'van', 'van',
+       'bus', 'saab', 'saab', 'bus', 'opel', 'van', 'bus', 'opel', 'van',
+       'saab', 'opel', 'bus', 'van', 'bus', 'van', 'bus', 'opel', 'opel',
+       'van', 'bus', 'saab', 'opel', 'opel', 'opel', 'saab', 'bus',
+       'opel', 'bus', 'saab', 'bus', 'bus', 'saab', 'saab', 'bus', 'saab',
+       'van', 'bus', 'saab', 'bus', 'van', 'opel', 'saab', 'opel', 'opel',
+       'van', 'bus', 'van', 'opel', 'saab', 'opel', 'saab', 'bus', 'bus',
+       'van', 'saab', 'saab', 'opel', 'bus', 'saab', 'saab', 'bus', 'van',
+       'van', 'bus', 'opel', 'saab', 'saab', 'saab', 'van', 'bus', 'bus',
+       'opel', 'van', 'opel', 'saab', 'van', 'bus', 'van', 'bus', 'bus',
+       'van', 'bus', 'opel', 'bus', 'opel', 'bus', 'saab', 'saab', 'van',
+       'bus', 'saab', 'van', 'van', 'opel', 'opel', 'bus', 'van', 'bus',
+       'opel', 'saab', 'bus', 'bus', 'opel', 'saab', 'bus', 'van', 'opel',
+       'bus', 'saab', 'van', 'van', 'opel', 'saab', 'saab', 'saab',
+       'saab', 'bus', 'bus', 'saab', 'van', 'van', 'bus', 'van', 'opel',
+       'bus', 'saab', 'van', 'opel', 'opel', 'opel', 'opel', 'saab',
+       'saab', 'opel', 'van', 'van', 'opel', 'saab', 'saab', 'bus',
+       'opel', 'opel', 'bus', 'van', 'opel', 'bus', 'bus', 'opel', 'saab',
+       'bus', 'van', 'bus', 'van', 'bus', 'bus', 'van', 'bus', 'opel',
+       'bus', 'van', 'saab', 'bus', 'van', 'opel', 'saab', 'opel', 'van',
+       'bus', 'bus', 'bus', 'saab', 'bus', 'saab', 'opel', 'bus', 'saab',
+       'opel', 'opel', 'opel', 'van', 'bus', 'saab', 'saab', 'opel',
+       'saab', 'saab', 'bus', 'opel', 'opel', 'opel', 'opel', 'opel',
+       'opel', 'saab', 'van', 'opel', 'van', 'saab', 'van', 'bus', 'van',
+       'van', 'opel', 'opel', 'saab', 'van', 'bus', 'bus', 'bus', 'bus',
+       'van', 'saab', 'saab', 'saab', 'saab', 'saab', 'opel', 'opel',
+       'van'], dtype=object)----
+
+
++*In[195]:*+
+[source, ipython3]
+----
+#Importamos las lib que nos ayudan a verificar el sistema
+from sklearn.metrics import classification_report, confusion_matrix
+print( confusion_matrix(y_test,predicciones) )
+----
+
+
++*Out[195]:*+
+----
+[[61  6 10  1]
+ [ 1 23 21  2]
+ [ 8 31 31  1]
+ [ 1  3  0 54]]
+----
+
+
++*In[196]:*+
+[source, ipython3]
+----
+print( classification_report(y_test,predicciones) )
+----
+
+
++*Out[196]:*+
+----
+              precision    recall  f1-score   support
+
+         bus       0.86      0.78      0.82        78
+        opel       0.37      0.49      0.42        47
+        saab       0.50      0.44      0.47        71
+         van       0.93      0.93      0.93        58
+
+    accuracy                           0.67       254
+   macro avg       0.66      0.66      0.66       254
+weighted avg       0.68      0.67      0.67       254
+
+----
+
+
++*In[197]:*+
+[source, ipython3]
+----
+#Algoritmo para encontrar el mejor n_neighbors
+tasa_error = []
+for j in range(1,30):
+    knn =  KNeighborsClassifier(n_neighbors = j)
+    knn.fit(x_train,y_train)
+    predic_j = knn.predict(x_test)
+    tasa_error.append( np.mean(predic_j != y_test) )
+#Graficamos
+valores = range(1,30)
+plt.plot(valores,tasa_error,c = 'g',marker ='o',markerfacecolor = 'r', markersize = 8)
+----
+
+
++*Out[197]:*+
+----[<matplotlib.lines.Line2D at 0x1ee98943bc8>]
+![png](output_18_1.png)
+----
+
+
++*In[199]:*+
+[source, ipython3]
+----
+#El error más pequeño es el 3, asi que usaremos el 3 para los n vecinos
+----
+
+==== Apartir de esta parte, es mi codigo para analizar cuales fueron
+correctos y cuales incorrectos
+
+
++*In[200]:*+
+[source, ipython3]
+----
+#y_test ya es una lista, entonces convertimos las predicciones en lista, ya que es un array
+predicciones = predicciones.tolist() 
+y_test = y_test.tolist()
+predicciones
+----
+
+
++*Out[200]:*+
+----['bus',
+ 'van',
+ 'bus',
+ 'bus',
+ 'bus',
+ 'van',
+ 'van',
+ 'saab',
+ 'bus',
+ 'saab',
+ 'saab',
+ 'bus',
+ 'bus',
+ 'saab',
+ 'opel',
+ 'van',
+ 'bus',
+ 'opel',
+ 'opel',
+ 'saab',
+ 'van',
+ 'van',
+ 'opel',
+ 'opel',
+ 'saab',
+ 'opel',
+ 'opel',
+ 'van',
+ 'van',
+ 'van',
+ 'saab',
+ 'van',
+ 'bus',
+ 'van',
+ 'van',
+ 'bus',
+ 'saab',
+ 'saab',
+ 'bus',
+ 'opel',
+ 'van',
+ 'bus',
+ 'opel',
+ 'van',
+ 'saab',
+ 'opel',
+ 'bus',
+ 'van',
+ 'bus',
+ 'van',
+ 'bus',
+ 'opel',
+ 'opel',
+ 'van',
+ 'bus',
+ 'saab',
+ 'opel',
+ 'opel',
+ 'opel',
+ 'saab',
+ 'bus',
+ 'opel',
+ 'bus',
+ 'saab',
+ 'bus',
+ 'bus',
+ 'saab',
+ 'saab',
+ 'bus',
+ 'saab',
+ 'van',
+ 'bus',
+ 'saab',
+ 'bus',
+ 'van',
+ 'opel',
+ 'saab',
+ 'opel',
+ 'opel',
+ 'van',
+ 'bus',
+ 'van',
+ 'opel',
+ 'saab',
+ 'opel',
+ 'saab',
+ 'bus',
+ 'bus',
+ 'van',
+ 'saab',
+ 'saab',
+ 'opel',
+ 'bus',
+ 'saab',
+ 'saab',
+ 'bus',
+ 'van',
+ 'van',
+ 'bus',
+ 'opel',
+ 'saab',
+ 'saab',
+ 'saab',
+ 'van',
+ 'bus',
+ 'bus',
+ 'opel',
+ 'van',
+ 'opel',
+ 'saab',
+ 'van',
+ 'bus',
+ 'van',
+ 'bus',
+ 'bus',
+ 'van',
+ 'bus',
+ 'opel',
+ 'bus',
+ 'opel',
+ 'bus',
+ 'saab',
+ 'saab',
+ 'van',
+ 'bus',
+ 'saab',
+ 'van',
+ 'van',
+ 'opel',
+ 'opel',
+ 'bus',
+ 'van',
+ 'bus',
+ 'opel',
+ 'saab',
+ 'bus',
+ 'bus',
+ 'opel',
+ 'saab',
+ 'bus',
+ 'van',
+ 'opel',
+ 'bus',
+ 'saab',
+ 'van',
+ 'van',
+ 'opel',
+ 'saab',
+ 'saab',
+ 'saab',
+ 'saab',
+ 'bus',
+ 'bus',
+ 'saab',
+ 'van',
+ 'van',
+ 'bus',
+ 'van',
+ 'opel',
+ 'bus',
+ 'saab',
+ 'van',
+ 'opel',
+ 'opel',
+ 'opel',
+ 'opel',
+ 'saab',
+ 'saab',
+ 'opel',
+ 'van',
+ 'van',
+ 'opel',
+ 'saab',
+ 'saab',
+ 'bus',
+ 'opel',
+ 'opel',
+ 'bus',
+ 'van',
+ 'opel',
+ 'bus',
+ 'bus',
+ 'opel',
+ 'saab',
+ 'bus',
+ 'van',
+ 'bus',
+ 'van',
+ 'bus',
+ 'bus',
+ 'van',
+ 'bus',
+ 'opel',
+ 'bus',
+ 'van',
+ 'saab',
+ 'bus',
+ 'van',
+ 'opel',
+ 'saab',
+ 'opel',
+ 'van',
+ 'bus',
+ 'bus',
+ 'bus',
+ 'saab',
+ 'bus',
+ 'saab',
+ 'opel',
+ 'bus',
+ 'saab',
+ 'opel',
+ 'opel',
+ 'opel',
+ 'van',
+ 'bus',
+ 'saab',
+ 'saab',
+ 'opel',
+ 'saab',
+ 'saab',
+ 'bus',
+ 'opel',
+ 'opel',
+ 'opel',
+ 'opel',
+ 'opel',
+ 'opel',
+ 'saab',
+ 'van',
+ 'opel',
+ 'van',
+ 'saab',
+ 'van',
+ 'bus',
+ 'van',
+ 'van',
+ 'opel',
+ 'opel',
+ 'saab',
+ 'van',
+ 'bus',
+ 'bus',
+ 'bus',
+ 'bus',
+ 'van',
+ 'saab',
+ 'saab',
+ 'saab',
+ 'saab',
+ 'saab',
+ 'opel',
+ 'opel',
+ 'van']----
+
+
++*In[201]:*+
+[source, ipython3]
+----
+y_test.__len__()
+----
+
+
++*Out[201]:*+
+----254----
+
+
++*In[202]:*+
+[source, ipython3]
+----
+predicciones.__len__() ##Tenemos el mismo largo de lista (obvio)
+----
+
+
++*Out[202]:*+
+----254----
+
+
++*In[203]:*+
+[source, ipython3]
+----
+y_test[100]
+----
+
+
++*Out[203]:*+
+----'saab'----
+
+
++*In[204]:*+
+[source, ipython3]
+----
+# Algoritmo para contar errores #
+countTrue = 0
+countFalse = 0
+for i in range(0,254):
+    if predicciones[i] == y_test[i]:
+        countTrue += 1
+    else:
+        countFalse += 1
+print("Acertados: "+str(countTrue)+"\nFallados: "+str(countFalse))
+----
+
+
++*Out[204]:*+
+----
+Acertados: 169
+Fallados: 85
+----
