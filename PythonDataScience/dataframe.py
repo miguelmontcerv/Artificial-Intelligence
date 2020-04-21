@@ -1,6 +1,6 @@
 #Conceptos basicos de un data frame
-import numpy as np 
-import pandas as pd 
+import numpy as np
+import pandas as pd
 
 filas = ['ventas1','ventas2','ventas3']
 columnas = ['zonaA','zonaB','zonaC']
@@ -25,7 +25,7 @@ print( df1)
 print("\n")
 print( df1.drop('TotalZonas',axis = 1) )
 
-print("")
+print("\n")
 df1.drop('TotalZonas',axis = 1,inplace = True)
 print(df1)
 
