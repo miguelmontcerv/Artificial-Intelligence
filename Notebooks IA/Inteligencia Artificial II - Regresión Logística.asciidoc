@@ -1,0 +1,412 @@
+= Inteligencia Artificial II - Regresión Logística
+
+
++*In[192]:*+
+[source, ipython3]
+----
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+----
+
+
++*In[193]:*+
+[source, ipython3]
+----
+entrenamiento = pd.read_csv('titanic.csv')
+entrenamiento.head()
+----
+
+
++*Out[193]:*+
+----
+[cols=",,,,,,,,,,,,",options="header",]
+|=======================================================================
+| |PassengerId |Survived |Pclass |Name |Sex |Age |SibSp |Parch |Ticket
+|Fare |Cabin |Embarked
+|0 |1 |0 |3 |Braund, Mr. Owen Harris |male |22.0 |1 |0 |A/5 21171
+|7.2500 |NaN |S
+
+|1 |2 |1 |1 |Cumings, Mrs. John Bradley (Florence Briggs Th... |female
+|38.0 |1 |0 |PC 17599 |71.2833 |C85 |C
+
+|2 |3 |1 |3 |Heikkinen, Miss. Laina |female |26.0 |0 |0 |STON/O2.
+3101282 |7.9250 |NaN |S
+
+|3 |4 |1 |1 |Futrelle, Mrs. Jacques Heath (Lily May Peel) |female |35.0
+|1 |0 |113803 |53.1000 |C123 |S
+
+|4 |5 |0 |3 |Allen, Mr. William Henry |male |35.0 |0 |0 |373450 |8.0500
+|NaN |S
+|=======================================================================
+----
+
+Para saber si alguna columna tiene datos nulos, hacemos lo siguiente:
+
+
++*In[194]:*+
+[source, ipython3]
+----
+sns.heatmap(entrenamiento.isnull())
+----
+
+
++*Out[194]:*+
+----<matplotlib.axes._subplots.AxesSubplot at 0x23295198208>
+![png](output_4_1.png)
+----
+
+Nos podemos dar cuenta de que las columnas `Age' y `Cabin' no tienen
+datos suficientes para ser analizados.
+
+Para ver el numero de personas de cada posibilidad dependiendo el tipo
+de celda, se hace lo siguiente:
+
+
++*In[195]:*+
+[source, ipython3]
+----
+sns.countplot(x='Pclass',data =entrenamiento, hue = 'Sex')
+----
+
+
++*Out[195]:*+
+----<matplotlib.axes._subplots.AxesSubplot at 0x232952727c8>
+![png](output_7_1.png)
+----
+
+Vamos a cambiar el valor nulo de los datos que lo tienen, por la media
+dependiendo del tipo de clase, para cambiarno lo la media tenemos que
+saber cual es la media, entonces, utilizamos un modelado de cajas que
+nos ayuda a identificar este parametro
+
+
++*In[196]:*+
+[source, ipython3]
+----
+sns.boxplot(x = 'Pclass', y = 'Age',data = entrenamiento)
+----
+
+
++*Out[196]:*+
+----<matplotlib.axes._subplots.AxesSubplot at 0x232952d5988>
+![png](output_9_1.png)
+----
+
+
++*In[197]:*+
+[source, ipython3]
+----
+def edad_media(columna):
+    edad = columna[0]
+    clase = columna[1]
+    if pd.isnull(edad):
+        if clase == 1:
+            return 38
+        elif clase == 2:
+            return 30
+        else:
+            return 25
+    else:
+        return edad
+----
+
+Aplicamos la función en *Age*, ponemos axis 1 por que son columnas
+
+
++*In[198]:*+
+[source, ipython3]
+----
+entrenamiento['Age'] = entrenamiento[['Age','Pclass']].apply(edad_media,axis = 1) 
+----
+
+
++*In[199]:*+
+[source, ipython3]
+----
+sns.heatmap(entrenamiento.isnull()) 
+----
+
+
++*Out[199]:*+
+----<matplotlib.axes._subplots.AxesSubplot at 0x2329532a588>
+![png](output_13_1.png)
+----
+
+Nos damos cuenta de que ya no hay valores nulos en *age* pero si en
+*cabin*, dado que *cabin* no tiene suficientes datos para la media, la
+borramos
+
+
++*In[200]:*+
+[source, ipython3]
+----
+entrenamiento.drop('Cabin',axis = 1, inplace = True) #Axis 1 por que es columna
+----
+
+
++*In[201]:*+
+[source, ipython3]
+----
+#Visualizamos los datos:
+sns.heatmap(entrenamiento.isnull())
+----
+
+
++*Out[201]:*+
+----<matplotlib.axes._subplots.AxesSubplot at 0x2329538b648>
+![png](output_16_1.png)
+----
+
+
++*In[202]:*+
+[source, ipython3]
+----
+#Ahora ya no hay ninun nulo :)
+entrenamiento.head() #Unicamente nos interesan las columas numericas
+----
+
+
++*Out[202]:*+
+----
+[cols=",,,,,,,,,,,",options="header",]
+|=======================================================================
+| |PassengerId |Survived |Pclass |Name |Sex |Age |SibSp |Parch |Ticket
+|Fare |Embarked
+|0 |1 |0 |3 |Braund, Mr. Owen Harris |male |22.0 |1 |0 |A/5 21171
+|7.2500 |S
+
+|1 |2 |1 |1 |Cumings, Mrs. John Bradley (Florence Briggs Th... |female
+|38.0 |1 |0 |PC 17599 |71.2833 |C
+
+|2 |3 |1 |3 |Heikkinen, Miss. Laina |female |26.0 |0 |0 |STON/O2.
+3101282 |7.9250 |S
+
+|3 |4 |1 |1 |Futrelle, Mrs. Jacques Heath (Lily May Peel) |female |35.0
+|1 |0 |113803 |53.1000 |S
+
+|4 |5 |0 |3 |Allen, Mr. William Henry |male |35.0 |0 |0 |373450 |8.0500
+|S
+|=======================================================================
+----
+
+
++*In[203]:*+
+[source, ipython3]
+----
+#Entonces las borramos
+entrenamiento.drop(['Name','Ticket'],axis = 1, inplace = True) #Axis 1 por que es columna
+----
+
+
++*In[204]:*+
+[source, ipython3]
+----
+entrenamiento.head() #Dejamos Sex
+----
+
+
++*Out[204]:*+
+----
+[cols=",,,,,,,,,",options="header",]
+|=======================================================================
+| |PassengerId |Survived |Pclass |Sex |Age |SibSp |Parch |Fare |Embarked
+|0 |1 |0 |3 |male |22.0 |1 |0 |7.2500 |S
+|1 |2 |1 |1 |female |38.0 |1 |0 |71.2833 |C
+|2 |3 |1 |3 |female |26.0 |0 |0 |7.9250 |S
+|3 |4 |1 |1 |female |35.0 |1 |0 |53.1000 |S
+|4 |5 |0 |3 |male |35.0 |0 |0 |8.0500 |S
+|=======================================================================
+----
+
+
++*In[205]:*+
+[source, ipython3]
+----
+sexo = pd.get_dummies(entrenamiento['Sex'], drop_first = 1) #Eliminamos la primera, para que sea un campo binario cerrado
+embarca = pd.get_dummies(entrenamiento['Embarked'], drop_first = 1) 
+----
+
+
++*In[206]:*+
+[source, ipython3]
+----
+entrenamiento = pd.concat([entrenamiento,sexo], axis = 1) #concatenamos la columna creada
+entrenamiento = pd.concat([entrenamiento,embarca], axis = 1) #concatenamos la columna creada
+#Borramos Sex
+entrenamiento.drop('Sex',axis = 1, inplace = True)
+entrenamiento.drop('Embarked',axis = 1, inplace = True)
+----
+
+
++*In[207]:*+
+[source, ipython3]
+----
+#Visualizamos los datos
+entrenamiento.head() 
+----
+
+
++*Out[207]:*+
+----
+[cols=",,,,,,,,,,",options="header",]
+|====================================================================
+| |PassengerId |Survived |Pclass |Age |SibSp |Parch |Fare |male |Q |S
+|0 |1 |0 |3 |22.0 |1 |0 |7.2500 |1 |0 |1
+|1 |2 |1 |1 |38.0 |1 |0 |71.2833 |0 |0 |0
+|2 |3 |1 |3 |26.0 |0 |0 |7.9250 |0 |0 |1
+|3 |4 |1 |1 |35.0 |1 |0 |53.1000 |0 |0 |1
+|4 |5 |0 |3 |35.0 |0 |0 |8.0500 |1 |0 |1
+|====================================================================
+----
+
+==== Con esto, queda finalizado la limpieza de datos
+
+==== Vamos a ver si un pasajero sobrevive o no, con base en las
+caracteristicas anteriores
+
+
++*In[224]:*+
+[source, ipython3]
+----
+y = entrenamiento['Survived']
+x = entrenamiento[['PassengerId','Pclass','Age','SibSp','Parch','Fare','male','Q','S']]
+----
+
+
++*In[225]:*+
+[source, ipython3]
+----
+from sklearn.model_selection import train_test_split 
+x_train, x_test, y_train, y_test = train_test_split(x,y,test_size = 0.3, random_state = 45) #El ultimo puede ser cualquiera
+----
+
+
++*In[226]:*+
+[source, ipython3]
+----
+from sklearn.linear_model import LogisticRegression
+----
+
+
++*In[227]:*+
+[source, ipython3]
+----
+modelo = LogisticRegression() #Creamos el modelo
+modelo.fit(x_train, y_train) #Lo entrenamos
+----
+
+
++*Out[227]:*+
+----
+C:\Users\migue\anaconda3\lib\site-packages\sklearn\linear_model\_logistic.py:940: ConvergenceWarning: lbfgs failed to converge (status=1):
+STOP: TOTAL NO. of ITERATIONS REACHED LIMIT.
+
+Increase the number of iterations (max_iter) or scale the data as shown in:
+    https://scikit-learn.org/stable/modules/preprocessing.html
+Please also refer to the documentation for alternative solver options:
+    https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression
+  extra_warning_msg=_LOGISTIC_SOLVER_CONVERGENCE_MSG)
+LogisticRegression(C=1.0, class_weight=None, dual=False, fit_intercept=True,
+                   intercept_scaling=1, l1_ratio=None, max_iter=100,
+                   multi_class='auto', n_jobs=None, penalty='l2',
+                   random_state=None, solver='lbfgs', tol=0.0001, verbose=0,
+                   warm_start=False)----
+
+Mi codigo
+
+
++*In[294]:*+
+[source, ipython3]
+----
+predicciones  = modelo.predict(x_test) #Hacemos las predicciones con los datos que separamos, y nos debe de dar lo mismo que y 
+#print(predicciones)
+predicciones = predicciones.tolist() 
+----
+
+
++*In[298]:*+
+[source, ipython3]
+----
+y_test.__len__()
+----
+
+
++*Out[298]:*+
+----268----
+
+
++*In[299]:*+
+[source, ipython3]
+----
+predicciones.__len__()
+----
+
+
++*Out[299]:*+
+----268----
+
+
++*In[304]:*+
+[source, ipython3]
+----
+countTrue = 0
+countFalse = 0
+for i in range(0,268):
+    if predicciones[i] == y_test[i]:
+        countTrue += 1
+    else:
+        countFalse += 1
+print("Acertados: "+str(countTrue)+"\nFallados: "+str(countFalse))
+----
+
+
++*Out[304]:*+
+----
+Acertados: 220
+Fallados: 48
+----
+
+==== Acertamos mucho más de los que fallamos :0
+
+
++*In[306]:*+
+[source, ipython3]
+----
+from sklearn.metrics import classification_report
+----
+
+
++*In[308]:*+
+[source, ipython3]
+----
+print(classification_report(y_test,predicciones))  #No entiendo del todo que es lo que me regresa pero segun es el marco de error
+----
+
+
++*Out[308]:*+
+----
+              precision    recall  f1-score   support
+
+           0       0.87      0.86      0.86       178
+           1       0.73      0.74      0.74        90
+
+    accuracy                           0.82       268
+   macro avg       0.80      0.80      0.80       268
+weighted avg       0.82      0.82      0.82       268
+
+----
+
+
++*In[310]:*+
+[source, ipython3]
+----
+from sklearn.metrics import confusion_matrix 
+confusion_matrix(y_test,predicciones) #Nos regresa los correctos (segun)
+----
+
+
++*Out[310]:*+
+----array([[153,  25],
+       [ 23,  67]], dtype=int64)----
