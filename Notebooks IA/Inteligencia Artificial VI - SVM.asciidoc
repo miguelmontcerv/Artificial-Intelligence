@@ -1,0 +1,223 @@
+= Inteligencia Artificial VI - SVM
+
+
++*In[93]:*+
+[source, ipython3]
+----
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+----
+
+
++*In[94]:*+
+[source, ipython3]
+----
+ls
+----
+
+
++*Out[94]:*+
+----
+ El volumen de la unidad C no tiene etiqueta.
+ El número de serie del volumen es: 6EA3-9454
+
+ Directorio de c:\escomc\InteligenciaArtificial\data sets
+
+24/04/2020  07:22 p. m.    <DIR>          .
+24/04/2020  07:22 p. m.    <DIR>          ..
+20/04/2020  05:35 p. m.             9,207 Ejemplo_Excel.xlsx
+20/04/2020  05:35 p. m.           248,876 Mia1.xlsx
+20/04/2020  05:35 p. m.           736,210 original.csv
+20/04/2020  05:35 p. m.            28,228 Primer.xlsx
+24/04/2020  07:22 p. m.               261 prog1.py
+20/04/2020  05:35 p. m.             4,857 salida.xlsx
+20/04/2020  05:35 p. m.             4,856 Salida_Excel.xlsx
+20/04/2020  05:35 p. m.            61,194 titanic.csv
+20/04/2020  09:16 p. m.            86,768 veiculos.csv
+21/04/2020  05:00 p. m.            12,895 vino.csv
+              10 archivos      1,193,352 bytes
+               2 dirs  360,806,563,840 bytes libres
+----
+
+
++*In[95]:*+
+[source, ipython3]
+----
+vinos = pd.read_csv('vino.csv')
+vinos.head()
+----
+
+
++*Out[95]:*+
+----
+[cols=",,,,,,,,,,,,,,",options="header",]
+|=======================================================================
+| |Alcohol |Malic acid |Ash |Alcalinity of ash |Magnesium |Total phenols
+|Flavanoids |Nonflavanoid phenols |Proanthocyanins |Color intensity |Hue
+|OD280/OD315 of diluted wines |Proline |Wine Type
+|0 |14.23 |1.71 |2.43 |15.6 |127.0 |2.80 |3.06 |0.28 |2.29 |5.64 |1.04
+|3.92 |1065.0 |One
+
+|1 |13.20 |1.78 |2.14 |11.2 |100.0 |2.65 |2.76 |0.26 |1.28 |4.38 |1.05
+|3.40 |1050.0 |One
+
+|2 |13.16 |2.36 |2.67 |18.6 |101.0 |2.80 |3.24 |0.30 |2.81 |5.68 |1.03
+|3.17 |1185.0 |One
+
+|3 |14.37 |1.95 |2.50 |16.8 |113.0 |3.85 |3.49 |0.24 |2.18 |7.80 |0.86
+|3.45 |1480.0 |One
+
+|4 |13.24 |2.59 |2.87 |21.0 |118.0 |2.80 |2.69 |0.39 |1.82 |4.32 |1.04
+|2.93 |735.0 |One
+|=======================================================================
+----
+
+
++*In[96]:*+
+[source, ipython3]
+----
+vinos['Wine Type'].value_counts()
+----
+
+
++*Out[96]:*+
+----Two      71
+One      59
+Three    48
+Name: Wine Type, dtype: int64----
+
+
++*In[97]:*+
+[source, ipython3]
+----
+#Graficamos los datos de este set
+#sns[].pairplot(vinos,hue = 'Wine Type')
+----
+
+
++*In[107]:*+
+[source, ipython3]
+----
+x = vinos.drop('Wine Type', axis = 1)
+y = vinos['Wine Type']
+
+from sklearn.model_selection import train_test_split
+x_train, x_test, y_train, y_test = train_test_split(x,y,test_size = 0.3, random_state = 45) #El ultimo puede ser cualquiera
+----
+
+
++*In[99]:*+
+[source, ipython3]
+----
+from sklearn.svm import SVC
+----
+
+
++*In[100]:*+
+[source, ipython3]
+----
+modelo = SVC(gamma = 'auto')
+----
+
+
++*In[101]:*+
+[source, ipython3]
+----
+modelo.fit(x_train,y_train)
+----
+
+
++*Out[101]:*+
+----SVC(C=1.0, break_ties=False, cache_size=200, class_weight=None, coef0=0.0,
+    decision_function_shape='ovr', degree=3, gamma='auto', kernel='rbf',
+    max_iter=-1, probability=False, random_state=None, shrinking=True,
+    tol=0.001, verbose=False)----
+
+
++*In[102]:*+
+[source, ipython3]
+----
+predicciones = modelo.predict(x_test)
+----
+
+
++*In[103]:*+
+[source, ipython3]
+----
+from sklearn.metrics import classification_report, confusion_matrix
+----
+
+
++*In[104]:*+
+[source, ipython3]
+----
+print( classification_report(y_test,predicciones) )
+print("\n..............................\n")
+print( confusion_matrix(y_test,predicciones) )
+----
+
+
++*Out[104]:*+
+----
+              precision    recall  f1-score   support
+
+         One       1.00      0.06      0.12        16
+       Three       0.00      0.00      0.00        20
+         Two       0.34      1.00      0.51        18
+
+    accuracy                           0.35        54
+   macro avg       0.45      0.35      0.21        54
+weighted avg       0.41      0.35      0.20        54
+
+
+..............................
+
+[[ 1  0 15]
+ [ 0  0 20]
+ [ 0  0 18]]
+
+C:\Users\migue\anaconda3\lib\site-packages\sklearn\metrics\_classification.py:1272: UndefinedMetricWarning: Precision and F-score are ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, msg_start, len(result))
+----
+
+Mi codigo
+
+
++*In[105]:*+
+[source, ipython3]
+----
+predicciones = predicciones.tolist() 
+y_test = y_test.tolist()
+
+print( str(y_test.__len__()) + " : " + str(y_test.__len__()))
+----
+
+
++*Out[105]:*+
+----
+54 : 54
+----
+
+
++*In[106]:*+
+[source, ipython3]
+----
+# Algoritmo para contar errores #
+countTrue = 0
+countFalse = 0
+for i in range(0,54):
+    if predicciones[i] == y_test[i]:
+        countTrue += 1
+    else:
+        countFalse += 1
+print("Acertados: "+str(countTrue)+"\nFallados: "+str(countFalse))
+----
+
+
++*Out[106]:*+
+----
+Acertados: 19
+Fallados: 35
+----
