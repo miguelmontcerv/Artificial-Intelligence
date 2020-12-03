@@ -1,4 +1,4 @@
-# Inteligencia Artificial
+# Artificial Intelligence
 December 3, 2020
 The field of **Artificial Intelligence** and **Data Science** has seemed very interesting to me in recent years, having a special place within the field of *computing*, the application of different mathematical concepts and their combination with programming makes it possible to create things surprising.
 
@@ -6,7 +6,7 @@ In this **repository** you will find part of the research that I have carried ou
 
 ### Web Pages
 - **Aprende Machine Learning antes de que sea demasiado tarde**
-  Basic, simple courses and blogs
+  >Basic, simple courses and blogs
   https://www.aprendemachinelearning.com/
 - **DataSource.AI**
   Skills, job search
