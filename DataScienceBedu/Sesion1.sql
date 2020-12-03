@@ -31,3 +31,21 @@ SELECT * FROM puesto ORDER BY salario DESC LIMIT 5; #Los 5 que ganan más
 #1
 #La respuesta al reto 1 esta en la imagen del respositorio con el nombre 'sesión1_reto1'
 #2
+/* ¿Cuál es el nombre de los empleados con el puesto 4? */
+SELECT nombre FROM empleado WHERE id_puesto = 4;
+/* ¿Qué puestos tienen un salario mayor a $10,000? */
+SELECT * FROM puesto WHERE salario > 10000 ORDER BY salario;
+/* ¿Qué articulos tienen un precio mayor a $1,000 y un iva mayor a 100? */
+SELECT * FROM articulo WHERE precio > 1000 AND iva > 100;
+/* ¿Qué ventas incluyen los artículos 135 o 963 y fueron hechas por los empleados 835 o 369? */
+SELECT * FROM venta WHERE (id_articulo = 135 OR id_articulo= 963) AND (id_empleado = 835 OR id_empleado=369);
+#3
+/*  Escribe una consulta que permita obtener el top 5 de puestos por salarios. */
+SELECT * FROM puesto ORDER BY salario DESC LIMIT 5;
+
+/* Ejercicios */
+/* 1.Dentro del mismo servidor de bases de datos, conéctate al esquema classicmodels. */
+USE classicmodels;
+/* Antes de empezar a trabajar con una base de datos, es importante conocer usus elementos y sus relaciones */
+#SELECT * FROM products;
+/* 2.Dentro de la tabla employees, obtén el apellido de todos los empleados. */
